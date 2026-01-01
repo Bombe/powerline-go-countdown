@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestPowerlineStructureIsMarshalledCorrectly(t *testing.T) {
 	output := ToPowerlineJson([]PowerlineSegment{{Content: "✅ success"}, {Content: "❌ failure"}})
@@ -10,14 +13,15 @@ func TestPowerlineStructureIsMarshalledCorrectly(t *testing.T) {
 }
 
 func TestColorFieldIsTranslatedAsForeground(t *testing.T) {
-	output := ToPowerlineJson([]PowerlineSegment{{Content: "✅ success", Color: "123"}, {Content: "❌ failure"}})
-	if output != "[{\"Content\":\"✅ success\",\"Foreground\":\"123\"},{\"Content\":\"❌ failure\"}]" {
+	color := json.Number("123")
+	output := ToPowerlineJson([]PowerlineSegment{{Content: "✅ success", Color: &color}, {Content: "❌ failure"}})
+	if output != "[{\"Content\":\"✅ success\",\"Foreground\":123},{\"Content\":\"❌ failure\"}]" {
 		t.Fatal("output was", output)
 	}
 }
 
 func TestColorFieldIsOmittedIfEmpty(t *testing.T) {
-	output := ToPowerlineJson([]PowerlineSegment{{Content: "✅ success", Color: ""}, {Content: "❌ failure"}})
+	output := ToPowerlineJson([]PowerlineSegment{{Content: "✅ success", Color: nil}, {Content: "❌ failure"}})
 	if output != "[{\"Content\":\"✅ success\"},{\"Content\":\"❌ failure\"}]" {
 		t.Fatal("output was", output)
 	}

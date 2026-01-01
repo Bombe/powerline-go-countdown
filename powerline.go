@@ -6,7 +6,7 @@ import (
 
 type PowerlineSegment struct {
 	Content string
-	Color   string `json:"Foreground,omitempty"`
+	Color   *json.Number `json:"Foreground,omitempty"`
 }
 
 func ToPowerlineJson(segments []PowerlineSegment) (output string) {

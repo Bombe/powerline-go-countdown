@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 	"testing/synctest"
@@ -122,18 +123,25 @@ func verifyThatDistanceToDateIsCalculatedCorrectly(t *testing.T, date string, ex
 }
 
 func TestThreeDigitHexColorIsTranslatedCorrectly(t *testing.T) {
-	verifyThatColorIsTranslatedCorrectly(t, "#48c", "31")
+	expectedColor := json.Number("31")
+	verifyThatColorIsTranslatedCorrectly(t, "#48c", &expectedColor)
 }
 
 func TestSixDigitHexColorIsTranslatedCorrectly(t *testing.T) {
-	verifyThatColorIsTranslatedCorrectly(t, "#7a1b2a", "52")
+	expectedColor := json.Number("52")
+	verifyThatColorIsTranslatedCorrectly(t, "#7a1b2a", &expectedColor)
 }
 
 func TestTerminalColorIsNotTranslated(t *testing.T) {
-	verifyThatColorIsTranslatedCorrectly(t, "246", "246")
+	expectedColor := json.Number("246")
+	verifyThatColorIsTranslatedCorrectly(t, "246", &expectedColor)
 }
 
-func verifyThatColorIsTranslatedCorrectly(t *testing.T, inputColor string, expectedColor string) {
+func TestUnparseableColorIsReplacedByEmptyColor(t *testing.T) {
+	verifyThatColorIsTranslatedCorrectly(t, "no-color", nil)
+}
+
+func verifyThatColorIsTranslatedCorrectly(t *testing.T, inputColor string, expectedColor *json.Number) {
 	synctest.Test(t, func(t *testing.T) {
 		configuration := NewConfiguration()
 		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-01-01", Occasion: "Some Point", Symbol: "x", Color: inputColor})
@@ -141,7 +149,7 @@ func verifyThatColorIsTranslatedCorrectly(t *testing.T, inputColor string, expec
 		if len(powerlineSegments) != 1 {
 			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
 		}
-		if powerlineSegments[0].Color != expectedColor {
+		if (expectedColor == nil && powerlineSegments[0].Color != nil) || (expectedColor != nil && (*powerlineSegments[0].Color != *expectedColor)) {
 			t.Fatal("color is", powerlineSegments[0].Color)
 		}
 	})

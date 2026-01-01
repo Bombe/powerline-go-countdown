@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"slices"
 	"strconv"
@@ -23,23 +24,30 @@ func terminalColorGradient(color uint8) uint8 {
 	return 5
 }
 
-func terminalColorFor(red, green, blue uint8) string {
-	return strconv.Itoa(int(16 + 36*terminalColorGradient(red) + 6*terminalColorGradient(green) + terminalColorGradient(blue)))
+func terminalColorFor(red, green, blue uint8) uint8 {
+	return 16 + 36*terminalColorGradient(red) + 6*terminalColorGradient(green) + terminalColorGradient(blue)
 }
 
-func convertColorToTerminalColor(color string) string {
+func convertColorToTerminalColor(color string) *json.Number {
 	if len(color) == 4 && color[0] == '#' {
 		r, _ := hex.DecodeString("0" + color[1:2])
 		g, _ := hex.DecodeString("0" + color[2:3])
 		b, _ := hex.DecodeString("0" + color[3:4])
-		return terminalColorFor(r[0]*17, g[0]*17, b[0]*17)
+		number := json.Number(strconv.Itoa(int(terminalColorFor(r[0]*17, g[0]*17, b[0]*17))))
+		return &number
 	} else if len(color) == 7 && color[0] == '#' {
 		r, _ := hex.DecodeString(color[1:3])
 		g, _ := hex.DecodeString(color[3:5])
 		b, _ := hex.DecodeString(color[5:7])
-		return terminalColorFor(r[0], g[0], b[0])
+		number := json.Number(strconv.Itoa(int(terminalColorFor(r[0], g[0], b[0]))))
+		return &number
 	}
-	return color
+	_, err := strconv.Atoi(color)
+	if err != nil {
+		return nil
+	}
+	jsonNumber := json.Number(color)
+	return &jsonNumber
 }
 
 func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []PowerlineSegment) {
