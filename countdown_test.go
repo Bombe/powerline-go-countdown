@@ -120,3 +120,29 @@ func verifyThatDistanceToDateIsCalculatedCorrectly(t *testing.T, date string, ex
 		}
 	})
 }
+
+func TestThreeDigitHexColorIsTranslatedCorrectly(t *testing.T) {
+	verifyThatColorIsTranslatedCorrectly(t, "#48c", "31")
+}
+
+func TestSixDigitHexColorIsTranslatedCorrectly(t *testing.T) {
+	verifyThatColorIsTranslatedCorrectly(t, "#7a1b2a", "52")
+}
+
+func TestTerminalColorIsNotTranslated(t *testing.T) {
+	verifyThatColorIsTranslatedCorrectly(t, "246", "246")
+}
+
+func verifyThatColorIsTranslatedCorrectly(t *testing.T, inputColor string, expectedColor string) {
+	synctest.Test(t, func(t *testing.T) {
+		configuration := NewConfiguration()
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-01-01", Occasion: "Some Point", Symbol: "x", Color: inputColor})
+		powerlineSegments := CreatePowerlineSegments(configuration)
+		if len(powerlineSegments) != 1 {
+			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
+		}
+		if powerlineSegments[0].Color != expectedColor {
+			t.Fatal("color is", powerlineSegments[0].Color)
+		}
+	})
+}

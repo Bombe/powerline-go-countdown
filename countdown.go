@@ -1,10 +1,46 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"slices"
+	"strconv"
 	"time"
 )
+
+func terminalColorGradient(color uint8) uint8 {
+	if color < 95 {
+		return 0
+	} else if color < 135 {
+		return 1
+	} else if color < 175 {
+		return 2
+	} else if color < 215 {
+		return 3
+	} else if color < 255 {
+		return 4
+	}
+	return 5
+}
+
+func terminalColorFor(red, green, blue uint8) string {
+	return strconv.Itoa(int(16 + 36*terminalColorGradient(red) + 6*terminalColorGradient(green) + terminalColorGradient(blue)))
+}
+
+func convertColorToTerminalColor(color string) string {
+	if len(color) == 4 && color[0] == '#' {
+		r, _ := hex.DecodeString("0" + color[1:2])
+		g, _ := hex.DecodeString("0" + color[2:3])
+		b, _ := hex.DecodeString("0" + color[3:4])
+		return terminalColorFor(r[0]*17, g[0]*17, b[0]*17)
+	} else if len(color) == 7 && color[0] == '#' {
+		r, _ := hex.DecodeString(color[1:3])
+		g, _ := hex.DecodeString(color[3:5])
+		b, _ := hex.DecodeString(color[5:7])
+		return terminalColorFor(r[0], g[0], b[0])
+	}
+	return color
+}
 
 func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []PowerlineSegment) {
 	powerlineSegments = []PowerlineSegment{}
@@ -31,7 +67,7 @@ func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []
 			continue
 		}
 		content := fmt.Sprintf("%s %d", deadline.Symbol, distance/86400000)
-		powerlineSegments = append(powerlineSegments, PowerlineSegment{Content: content})
+		powerlineSegments = append(powerlineSegments, PowerlineSegment{Content: content, Color: convertColorToTerminalColor(deadline.Color)})
 	}
 	return
 }

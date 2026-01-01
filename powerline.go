@@ -1,9 +1,12 @@
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type PowerlineSegment struct {
 	Content string
+	Color   string `json:"Foreground,omitempty"`
 }
 
 func ToPowerlineJson(segments []PowerlineSegment) (output string) {

@@ -10,6 +10,7 @@ type Deadline struct {
 	Date     string
 	Occasion string
 	Symbol   string
+	Color    string
 }
 
 type Configuration struct {

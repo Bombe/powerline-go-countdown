@@ -46,7 +46,7 @@ func TestConfigurationCanBeUnmarshalledCorrectly(t *testing.T) {
 		t.Fatal("could not create temp file")
 	}
 	defer os.Remove(tempFile.Name())
-	_, err = io.WriteString(tempFile, "{\"deadlines\": [{\"date\": \"2026-01-01 00:00:00\", \"occasion\": \"New Year 2026\", \"symbol\": \"🎆\"},{\"date\": \"2026-06-07 00:00:00\",\"occasion\": \"June 7th\",\"symbol\": \"🥂\"}]}")
+	_, err = io.WriteString(tempFile, "{\"deadlines\": [{\"date\": \"2026-01-01 00:00:00\", \"occasion\": \"New Year 2026\", \"symbol\": \"🎆\", \"color\": \"#fff\"},{\"date\": \"2026-06-07 00:00:00\",\"occasion\": \"June 7th\",\"symbol\": \"🥂\"}]}")
 	if err != nil {
 		t.Fatal("could not write to temp file")
 	}
@@ -61,11 +61,13 @@ func TestConfigurationCanBeUnmarshalledCorrectly(t *testing.T) {
 				Date:     "2026-01-01 00:00:00",
 				Occasion: "New Year 2026",
 				Symbol:   "🎆",
+				Color:    "#fff",
 			},
 			{
 				Date:     "2026-06-07 00:00:00",
 				Occasion: "June 7th",
 				Symbol:   "🥂",
+				Color:    "",
 			},
 		},
 	}
