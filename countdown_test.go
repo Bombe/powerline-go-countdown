@@ -155,3 +155,36 @@ func verifyThatColorIsTranslatedCorrectly(t *testing.T, inputColor string, expec
 		}
 	})
 }
+
+func TestThreeDigitHexBackgroundColorIsTranslatedCorrectly(t *testing.T) {
+	expectedColor := json.Number("31")
+	verifyThatBackgroundColorIsTranslatedCorrectly(t, "#48c", &expectedColor)
+}
+
+func TestSixDigitHexBackgroundColorIsTranslatedCorrectly(t *testing.T) {
+	expectedColor := json.Number("52")
+	verifyThatBackgroundColorIsTranslatedCorrectly(t, "#7a1b2a", &expectedColor)
+}
+
+func TestTerminalBackgroundColorIsNotTranslated(t *testing.T) {
+	expectedColor := json.Number("246")
+	verifyThatBackgroundColorIsTranslatedCorrectly(t, "246", &expectedColor)
+}
+
+func TestUnparseableBackgroundColorIsReplacedByEmptyColor(t *testing.T) {
+	verifyThatBackgroundColorIsTranslatedCorrectly(t, "no-color", nil)
+}
+
+func verifyThatBackgroundColorIsTranslatedCorrectly(t *testing.T, inputColor string, expectedColor *json.Number) {
+	synctest.Test(t, func(t *testing.T) {
+		configuration := NewConfiguration()
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-01-01", Occasion: "Some Point", Symbol: "x", BackgroundColor: inputColor})
+		powerlineSegments := CreatePowerlineSegments(configuration)
+		if len(powerlineSegments) != 1 {
+			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
+		}
+		if (expectedColor == nil && powerlineSegments[0].BackgroundColor != nil) || (expectedColor != nil && (*powerlineSegments[0].BackgroundColor != *expectedColor)) {
+			t.Fatal("color is", powerlineSegments[0].BackgroundColor)
+		}
+	})
+}

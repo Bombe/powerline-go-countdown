@@ -73,7 +73,7 @@ func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []
 			continue
 		}
 		content := fmt.Sprintf("%s %d", deadline.Symbol, (distance+86399000)/86400000)
-		powerlineSegments = append(powerlineSegments, PowerlineSegment{Content: content, Color: convertColorToTerminalColor(deadline.Color)})
+		powerlineSegments = append(powerlineSegments, PowerlineSegment{Content: content, Color: convertColorToTerminalColor(deadline.Color), BackgroundColor: convertColorToTerminalColor(deadline.BackgroundColor)})
 	}
 	return
 }
