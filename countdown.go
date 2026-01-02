@@ -53,6 +53,7 @@ func convertColorToTerminalColor(color string) *json.Number {
 func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []PowerlineSegment) {
 	powerlineSegments = []PowerlineSegment{}
 	now := time.Now()
+	now = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), time.UTC)
 	slices.SortFunc(configuration.Deadlines, func(first, second Deadline) int {
 		if first.Date == second.Date {
 			return 0
@@ -62,9 +63,9 @@ func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []
 		return 1
 	})
 	for _, deadline := range configuration.Deadlines {
-		date, err := time.Parse("2006-01-02 03:04:05", deadline.Date)
+		date, err := time.ParseInLocation("2006-01-02 03:04:05", deadline.Date, time.UTC)
 		if err != nil {
-			date, err = time.Parse("2006-01-02", deadline.Date)
+			date, err = time.ParseInLocation("2006-01-02", deadline.Date, time.UTC)
 		}
 		if err != nil {
 			/* skip this deadline. */
