@@ -123,6 +123,20 @@ func verifyThatDistanceToDateIsCalculatedCorrectly(t *testing.T, date string, ex
 	})
 }
 
+func TestOmittedSymbolDoesNotCauseASpaceToBePrependedToNumberOfDays(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		configuration := NewConfiguration()
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-01-02", Occasion: "Some Point"})
+		powerlineSegments := CreatePowerlineSegments(configuration)
+		if len(powerlineSegments) != 1 {
+			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
+		}
+		if powerlineSegments[0].Content != "1" {
+			t.Fatal("content is", powerlineSegments[0].Content)
+		}
+	})
+}
+
 func TestThreeDigitHexColorIsTranslatedCorrectly(t *testing.T) {
 	expectedColor := json.Number("31")
 	verifyThatColorIsTranslatedCorrectly(t, "#48c", &expectedColor)

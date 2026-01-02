@@ -70,6 +70,13 @@ func convertColorToTerminalColor(color string) *json.Number {
 	return &jsonNumber
 }
 
+func formatSymbolAndDistance(symbol string, distance int64) string {
+	if len(symbol) == 0 {
+		return strconv.FormatInt(distance, 10)
+	}
+	return fmt.Sprintf("%s %d", symbol, distance)
+}
+
 func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []PowerlineSegment) {
 	powerlineSegments = []PowerlineSegment{}
 	now := time.Now().In(time.UTC)
@@ -92,7 +99,7 @@ func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []
 		if distance < 0 {
 			continue
 		}
-		content := fmt.Sprintf("%s %d", deadline.Symbol, (distance+86399000)/86400000)
+		content := formatSymbolAndDistance(deadline.Symbol, (distance+86399000)/86400000)
 		powerlineSegments = append(powerlineSegments, PowerlineSegment{Content: content, Color: convertColorToTerminalColor(deadline.Color), BackgroundColor: convertColorToTerminalColor(deadline.BackgroundColor)})
 	}
 	return
