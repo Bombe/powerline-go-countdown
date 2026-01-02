@@ -52,8 +52,8 @@ func convertColorToTerminalColor(color string) *json.Number {
 
 func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []PowerlineSegment) {
 	powerlineSegments = []PowerlineSegment{}
-	now := time.Now()
-	now = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), time.UTC)
+	now := time.Now().In(time.UTC)
+	now = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	slices.SortFunc(configuration.Deadlines, func(first, second Deadline) int {
 		if first.Date == second.Date {
 			return 0
@@ -63,10 +63,7 @@ func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []
 		return 1
 	})
 	for _, deadline := range configuration.Deadlines {
-		date, err := time.ParseInLocation("2006-01-02 03:04:05", deadline.Date, time.UTC)
-		if err != nil {
-			date, err = time.ParseInLocation("2006-01-02", deadline.Date, time.UTC)
-		}
+		date, err := time.ParseInLocation("2006-01-02", deadline.Date, time.UTC)
 		if err != nil {
 			/* skip this deadline. */
 			continue
@@ -75,7 +72,7 @@ func CreatePowerlineSegments(configuration *Configuration) (powerlineSegments []
 		if distance < 0 {
 			continue
 		}
-		content := fmt.Sprintf("%s %d", deadline.Symbol, distance/86400000)
+		content := fmt.Sprintf("%s %d", deadline.Symbol, (distance+86399000)/86400000)
 		powerlineSegments = append(powerlineSegments, PowerlineSegment{Content: content, Color: convertColorToTerminalColor(deadline.Color)})
 	}
 	return

@@ -19,8 +19,8 @@ func TestConfigurationWithoutDeadlinesIsTurnedIntoEmptyPowerlineSegments(t *test
 func TestConfigurationWithTwoDeadlineIsTurnedIntoTwoPowerlineSegments(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		configuration := NewConfiguration()
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-03-04 08:38:15", Occasion: "Some Point", Symbol: "x"})
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05 08:38:15", Occasion: "Other Point", Symbol: "y"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-03-04", Occasion: "Some Point", Symbol: "x"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05", Occasion: "Other Point", Symbol: "y"})
 		powerlineSegments := CreatePowerlineSegments(configuration)
 		if len(powerlineSegments) != 2 {
 			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
@@ -37,9 +37,9 @@ func TestConfigurationWithTwoDeadlineIsTurnedIntoTwoPowerlineSegments(t *testing
 func TestPowerlineSegmentsAreSortedBySmallestDistanceFirst(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		configuration := NewConfiguration()
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-03-04 08:38:15", Occasion: "Some Point", Symbol: "z"})
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-03-04 08:38:15", Occasion: "Some Point", Symbol: "x"})
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05 08:38:15", Occasion: "Other Point", Symbol: "y"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-03-04", Occasion: "Some Point", Symbol: "z"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-03-04", Occasion: "Some Point", Symbol: "x"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05", Occasion: "Other Point", Symbol: "y"})
 		powerlineSegments := CreatePowerlineSegments(configuration)
 		if len(powerlineSegments) != 3 {
 			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
@@ -59,9 +59,9 @@ func TestPowerlineSegmentsAreSortedBySmallestDistanceFirst(t *testing.T) {
 func TestDeadlinesInThePastAreIgnored(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		configuration := NewConfiguration()
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-03-04 08:38:15", Occasion: "Some Point", Symbol: "z"})
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "1999-03-04 08:38:15", Occasion: "Some Point", Symbol: "x"})
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05 08:38:15", Occasion: "Other Point", Symbol: "y"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-03-04", Occasion: "Some Point", Symbol: "z"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "1999-03-04", Occasion: "Some Point", Symbol: "x"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05", Occasion: "Other Point", Symbol: "y"})
 		powerlineSegments := CreatePowerlineSegments(configuration)
 		if len(powerlineSegments) != 2 {
 			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
@@ -78,9 +78,9 @@ func TestDeadlinesInThePastAreIgnored(t *testing.T) {
 func TestDeadlinesThatCanNotBeParsedAreIgnored(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		configuration := NewConfiguration()
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-03-04 08:38:15", Occasion: "Some Point", Symbol: "z"})
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-03-04 37:81:162", Occasion: "Some Point", Symbol: "x"})
-		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05 08:38:15", Occasion: "Other Point", Symbol: "y"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2001-03-04", Occasion: "Some Point", Symbol: "z"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-38-145", Occasion: "Some Point", Symbol: "x"})
+		configuration.Deadlines = append(configuration.Deadlines, Deadline{Date: "2000-04-05", Occasion: "Other Point", Symbol: "y"})
 		powerlineSegments := CreatePowerlineSegments(configuration)
 		if len(powerlineSegments) != 2 {
 			t.Fatal("unexpected number of powerline segments:", len(powerlineSegments))
@@ -95,16 +95,17 @@ func TestDeadlinesThatCanNotBeParsedAreIgnored(t *testing.T) {
 }
 
 func TestDistanceUntilTimeOnSameDateAsNowIsZero(t *testing.T) {
-	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-01 12:18:34", 0, time.Duration(0))
+	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-01", 0, 43200*time.Second)
 }
 
 func TestDistanceUntilTimeOnTomorrowIsOne(t *testing.T) {
-	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-02 12:18:34", 1, time.Duration(0))
+	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-02", 1, time.Duration(0))
 }
 
 func TestOmittedTimestampCountsUntilMidnight(t *testing.T) {
 	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-02", 1, time.Duration(0))
-	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-02", 0, time.Duration(1000000))
+	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-02", 1, 86399*time.Second)
+	verifyThatDistanceToDateIsCalculatedCorrectly(t, "2000-01-02", 0, 86400*time.Second)
 }
 
 func verifyThatDistanceToDateIsCalculatedCorrectly(t *testing.T, date string, expectedDistance int, delay time.Duration) {
