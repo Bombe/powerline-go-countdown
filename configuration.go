@@ -7,9 +7,11 @@ import (
 )
 
 type Deadline struct {
-	Date     string
-	Occasion string
-	Symbol   string
+	Date            string
+	Occasion        string
+	Symbol          string
+	Color           string
+	BackgroundColor string `json:"bgcolor"`
 }
 
 type Configuration struct {
