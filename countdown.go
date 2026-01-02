@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"slices"
 	"strconv"
 	"time"
@@ -28,18 +29,37 @@ func terminalColorFor(red, green, blue uint8) uint8 {
 	return 16 + 36*terminalColorGradient(red) + 6*terminalColorGradient(green) + terminalColorGradient(blue)
 }
 
+func terminalGrayscaleFor(gray uint8) uint8 {
+	if gray < 8 {
+		return 16
+	} else if gray == 255 {
+		return 231
+	}
+	return uint8(math.Min(232+(float64(gray)-8)/10, 255))
+}
+
 func convertColorToTerminalColor(color string) *json.Number {
 	if len(color) == 4 && color[0] == '#' {
 		r, _ := hex.DecodeString("0" + color[1:2])
 		g, _ := hex.DecodeString("0" + color[2:3])
 		b, _ := hex.DecodeString("0" + color[3:4])
-		number := json.Number(strconv.Itoa(int(terminalColorFor(r[0]*17, g[0]*17, b[0]*17))))
+		var number json.Number
+		if r[0] == g[0] && g[0] == b[0] {
+			number = json.Number(strconv.Itoa(int(terminalGrayscaleFor(r[0] * 17))))
+		} else {
+			number = json.Number(strconv.Itoa(int(terminalColorFor(r[0]*17, g[0]*17, b[0]*17))))
+		}
 		return &number
 	} else if len(color) == 7 && color[0] == '#' {
 		r, _ := hex.DecodeString(color[1:3])
 		g, _ := hex.DecodeString(color[3:5])
 		b, _ := hex.DecodeString(color[5:7])
-		number := json.Number(strconv.Itoa(int(terminalColorFor(r[0], g[0], b[0]))))
+		var number json.Number
+		if r[0] == g[0] && g[0] == b[0] {
+			number = json.Number(strconv.Itoa(int(terminalGrayscaleFor(r[0]))))
+		} else {
+			number = json.Number(strconv.Itoa(int(terminalColorFor(r[0], g[0], b[0]))))
+		}
 		return &number
 	}
 	_, err := strconv.Atoi(color)

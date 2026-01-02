@@ -156,6 +156,48 @@ func verifyThatColorIsTranslatedCorrectly(t *testing.T, inputColor string, expec
 	})
 }
 
+func TestGrayscaleColorsAreTranslatedToDifferentScale(t *testing.T) {
+	colors := make(map[string]*json.Number)
+	colors["#000"] = toJson("16")
+	colors["#111"] = toJson("232")
+	colors["#222"] = toJson("234")
+	colors["#888"] = toJson("244")
+	colors["#ededed"] = toJson("254")
+	colors["#f0f0f0"] = toJson("255")
+	colors["#fff"] = toJson("231")
+	colors["invalid"] = toJson(nil)
+	for inputColor, expectedColor := range colors {
+		t.Run(fmt.Sprintf("%s -> %s", inputColor, expectedColor), func(t *testing.T) {
+			verifyThatColorIsTranslatedCorrectly(t, inputColor, expectedColor)
+		})
+	}
+}
+
+func TestGrayscaleBackgroundColorsAreTranslatedToDifferentScale(t *testing.T) {
+	colors := make(map[string]*json.Number)
+	colors["#000"] = toJson("16")
+	colors["#111"] = toJson("232")
+	colors["#222"] = toJson("234")
+	colors["#888"] = toJson("244")
+	colors["#ededed"] = toJson("254")
+	colors["#f0f0f0"] = toJson("255")
+	colors["#fff"] = toJson("231")
+	colors["invalid"] = toJson(nil)
+	for inputColor, expectedColor := range colors {
+		t.Run(fmt.Sprintf("%s -> %s", inputColor, expectedColor), func(t *testing.T) {
+			verifyThatBackgroundColorIsTranslatedCorrectly(t, inputColor, expectedColor)
+		})
+	}
+}
+
+func toJson(color any) *json.Number {
+	if color == nil {
+		return nil
+	}
+	jsonNumber := json.Number(color.(string))
+	return &jsonNumber
+}
+
 func TestThreeDigitHexBackgroundColorIsTranslatedCorrectly(t *testing.T) {
 	expectedColor := json.Number("31")
 	verifyThatBackgroundColorIsTranslatedCorrectly(t, "#48c", &expectedColor)
