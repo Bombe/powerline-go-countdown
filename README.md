@@ -2,7 +2,7 @@
 
 **powerline-go-countdown** is a segment for [powerline-go](https://github.com/justjanne/powerline-go) that shows the number of remaining days until a date. It can be used to count down the days to your next vacation, your wedding, or your retirement, or whatever else you are looking forward to.
 
-The configuration is done via JSON, in `$XDG_CONFIG_HOME/powerline/countdown.json`. Here’s an example:
+The configuration is done via JSON, in `$XDG_CONFIG_HOME/powerline-go/countdown.json`. Here’s an example:
 
 ```json
 {
